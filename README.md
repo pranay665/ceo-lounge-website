@@ -23,6 +23,12 @@ python -m http.server 8899 --directory .
 
 Then open http://localhost:8899.
 
+## Deploying
+
+Hosted on Netlify. `netlify.toml` publishes the repo root with no build
+command, since there is nothing to compile. Connect the repo in Netlify and it
+deploys on every push to `main`.
+
 ## How the layout works
 
 Every page renders the door artwork at an identical size and position, so the

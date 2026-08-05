@@ -1,0 +1,20 @@
+# Netlify deploy config.
+# Plain HTML/CSS/JS with no build step, so the repo root is published as-is
+# and no build command is defined.
+
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# The artwork and logo are immutable — a changed image gets a new filename,
+# and style.css / main.js are cache-busted with a ?v= query instead.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
