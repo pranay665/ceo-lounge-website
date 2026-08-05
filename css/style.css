@@ -1,0 +1,628 @@
+/* ==========================================================================
+   CEO LOUNGE — design system
+   Dark, brass-gold, editorial. Shared across every page in this project.
+   ========================================================================== */
+
+:root {
+  --ink: #0b0907;
+  --ink-2: #16120d;
+  --ink-3: #201a13;
+  --gold: #c9973f;
+  --gold-soft: rgba(201, 151, 63, 0.35);
+  --paper: #f3efe6;
+  --paper-dim: rgba(243, 239, 230, 0.72);
+  --paper-faint: rgba(243, 239, 230, 0.45);
+  --gray: #9d998f;
+
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --container: 1180px;
+
+  /* Usable viewport width, which the artwork is sized from. `scrollbar-gutter:
+     stable` on <html> above makes this consistent between pages that scroll
+     and pages that don't — without it the landing measured ~15px wider than
+     XLounge/XSearch and rendered the artwork ~3% larger. */
+  --vw: 100vw;
+}
+
+* , *::before, *::after { box-sizing: border-box; }
+/* Reserve the scrollbar gutter on every page, including the ones that don't
+   scroll. Otherwise a non-scrolling page (the landing) has ~15px more usable
+   width than a scrolling one (XLounge/XSearch), and the artwork — which is
+   sized from that width — renders ~3% larger there. `overflow: hidden` still
+   makes an element a scroll container, so the gutter is reserved there too. */
+html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img, svg { max-width: 100%; display: block; }
+h1, h2, h3, h4 { margin: 0; font-weight: 400; }
+p { margin: 0; }
+button { font-family: inherit; }
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* On the artwork pages the container is left-aligned to the artwork's own
+   text column instead of being centred in the viewport, so copy starts in
+   the same place as the baked text on the landing. The indent already
+   accounts for the container's 32px padding. */
+.site-bg .container {
+  margin-left: var(--content-indent);
+  margin-right: 0;
+  max-width: min(var(--container), calc(100% - var(--content-indent)));
+}
+
+/* ---------- shared background — the branded door artwork ----------
+   Every page except the landing sits on this, laid out to match the landing
+   and enter screens exactly: same fit, and centred in the first viewport
+   rather than anchored to a corner, so the baked CEO LOUNGE mark lands at
+   the same place on all four pages. Because the artwork's left two-thirds is
+   pure black (measured max luminance 3-5), no scrim is needed for
+   legibility — and a scrim would have dimmed the baked logo. Contrast for
+   content that lands over the lit doorway is handled per component instead
+   (cards, rows and bands carry their own translucent backing). */
+.site-bg {
+  position: relative;
+  min-height: 100vh;
+  background: #030202;
+  overflow: hidden;
+  /* The rendered artwork box — the SAME fit the landing uses, so the door
+     reads at an identical size on every page. */
+  --art-w: min(var(--vw), calc(100vh * 1.499));
+  --art-h: min(100vh, calc(var(--vw) / 1.499));
+  /* Where the artwork's own copy begins: 6.8% in from its left edge, the
+     same margin the baked text on the landing sits at. Content is indented
+     to this line so type starts in the same column across all pages. */
+  --content-left: calc((100% - var(--art-w)) / 2 + var(--art-w) * 0.068);
+  --content-indent: max(0px, calc(var(--content-left) - 32px));
+  /* One typographic unit = 1% of the artwork width, floored so body copy
+     stays readable on small screens. Shared with the landing/enter stage. */
+  --u: max(10px, calc(var(--art-w) / 100));
+}
+/* The artwork sits in the first viewport and scrolls away with the page. It
+   is deliberately NOT viewport-fixed: the baked logo would otherwise stay
+   pinned in the corner and collide with content scrolling past it. */
+.site-bg::before {
+  content: '';
+  position: absolute;
+  top: calc((100vh - var(--art-h)) / 2);
+  left: calc((100% - var(--art-w)) / 2);
+  width: var(--art-w);
+  height: var(--art-h);
+  z-index: 0;
+  background-image: url('../assets/images/page-bg.png');
+  background-size: 100% 100%;   /* box ratio equals the image ratio */
+  background-position: left top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+/* The artwork's bottom and right edges carry the lit floor and doorway
+   (measured max luminance 251, against 1 on the left), so fitting the whole
+   image would end it in a hard bright cut against the page black. Fade both
+   of those edges out; the left and top edges are already black. */
+.site-bg::after {
+  content: '';
+  position: absolute;
+  top: calc((100vh - var(--art-h)) / 2);
+  left: calc((100% - var(--art-w)) / 2);
+  width: var(--art-w);
+  height: var(--art-h);
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3,2,2,0) calc(100% - 96px), #030202 100%),
+    linear-gradient(90deg, rgba(3,2,2,0) calc(100% - 88px), #030202 100%);
+}
+
+/* ---------- real XSearch logo (white lockup, for dark grounds) ----------
+   Sits in the hero, not the top-left corner: the baked CEO LOUNGE mark in
+   the background artwork already owns that spot. */
+.xsearch-logo img { height: 64px; width: auto; }
+.xsearch-logo--hero { display: inline-block; margin-bottom: 26px; }
+.xsearch-logo--hero img { height: max(64px, 6.4em); }   /* tracks the hero's --u */
+.choose-mark--img img { height: 96px; width: auto; }
+
+/* ==========================================================================
+   LANDING — full-bleed composed artwork.
+   All headline copy lives inside the image; only the Enter and Contact
+   links are real DOM. The stage below reproduces `object-fit: cover`
+   geometry as a real box, so overlay links stay locked to the artwork
+   at every viewport size instead of drifting as the image crops.
+   ========================================================================== */
+:root { --art-ar: 1.499; }         /* 1535 / 1024 */
+
+html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
+
+.stage {
+  position: absolute;
+  inset: 0;
+  /* Matches the artwork's own perimeter, which is pure black (measured max
+     luminance 1-13 on all four edges), so the fit is seamless. */
+  background: #000;
+  overflow: hidden;
+}
+.stage-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Fit the whole artwork: never crop, because every word of copy is baked
+     into the image. A `cover` fill would slice the logo and the feature row
+     off on a 16:9 display. */
+  width: min(var(--vw), calc(100vh * var(--art-ar)));
+  height: min(100vh, calc(var(--vw) / var(--art-ar)));
+  /* 1% of artwork width — overlay links size in em so they scale with the art.
+     Floored at 9px so Enter/Contact stay legible when the artwork is small. */
+  font-size: max(9px, calc(min(var(--vw), 100vh * var(--art-ar)) / 100));
+}
+.stage-art {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill; /* box ratio equals the image ratio, so no distortion */
+}
+
+/* --- overlay links, positioned in % of the artwork --- */
+.art-topbar {
+  position: absolute;
+  top: 4.4%;
+  left: 4%;
+  right: 4%;
+  height: 5.8%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.art-contact {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.8em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85em;
+  transition: color 0.2s ease;
+}
+.art-contact::after {
+  content: '';
+  width: 2.1em;
+  height: 1px;
+  background: var(--paper-faint);
+  transition: background 0.2s ease;
+}
+.art-contact:hover { color: var(--gold); }
+.art-contact:hover::after { background: var(--gold); }
+
+.art-enter {
+  position: absolute;
+  left: 6.8%;
+  top: 70%;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.85em;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2em;
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid var(--gold-soft);
+  transition: gap 0.2s ease, border-color 0.2s ease;
+}
+.art-enter svg { width: 1.25em; height: 1.25em; }
+.art-enter:hover { gap: 1.7em; border-color: var(--gold); }
+
+.art-topbar a:focus-visible,
+.art-enter:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; }
+
+/* ---------- header / logo lockup ---------- */
+/* The CEO LOUNGE mark is baked into the background artwork, so the header
+   carries only its right-hand links. The baked mark's vertical centre sits
+   at 7.6% of the artwork's height — and the artwork scales with the
+   viewport — so the header is padded off that same measure, keeping the
+   links on the logo's optical line at every aspect ratio. */
+.site-header {
+  position: relative;
+  z-index: 3;
+  /* --art-h is inherited from .site-bg, so the links track the artwork's
+     rendered height. The artwork is centred in the first viewport, so the
+     offset above it counts toward the baked logo's line as well. */
+  padding: calc((100vh - var(--art-h)) / 2 + var(--art-h) * 0.0762 - 10px) 0 26px;
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 28px;
+}
+.brand-ceo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.brand-ceo .mark {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: 0.01em;
+  color: var(--gray);
+}
+.brand-ceo .word {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 4px;
+}
+.top-link {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: color 0.2s ease;
+}
+.top-link::after {
+  content: '';
+  width: 26px; height: 1px;
+  background: var(--paper-faint);
+}
+.top-link:hover { color: var(--gold); }
+.top-link:hover::after { background: var(--gold); }
+.top-link--back::after { display: none; content: none; }
+.top-link--back::before {
+  content: '\2190';
+  margin-right: -2px;
+}
+.top-nav { display: flex; align-items: center; gap: 32px; }
+
+/* ---------- brand mark: bracket-X, tinted per sub-brand ---------- */
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-mark .mark-glyph { width: 32px; height: 32px; flex-shrink: 0; }
+.brand-mark .mark-glyph svg { width: 100%; height: 100%; }
+.brand-mark .mark-word {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+.brand-mark--gold { color: var(--gold); }
+.brand-mark--white { color: var(--paper); }
+
+/* ---------- hero ----------
+   Hero type is sized in `em` off --u (1% of the artwork width), the same
+   unit the landing's baked headline was set at, so the headline matches
+   across pages instead of running ~50% larger from its old 5vw rule. The
+   max() floors keep everything readable once the artwork gets small. */
+.hero {
+  position: relative;
+  min-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: var(--u);
+}
+.hero .container { position: relative; z-index: 1; padding: 40px 32px 64px; }
+.hero-eyebrow {
+  font-family: var(--font-sans);
+  font-size: max(0.7rem, 0.75em);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  display: block;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: max(2rem, 4em);
+  line-height: 1.14;
+  max-width: 15ch;
+  color: var(--paper);
+  margin-bottom: 26px;
+}
+.hero h1 .accent { color: var(--gold); display: block; }
+.hero-rule { width: 46px; height: 1px; background: rgba(243,239,230,0.3); margin-bottom: 24px; }
+.hero .lede {
+  max-width: 48ch;
+  color: var(--paper-dim);
+  font-size: max(1rem, 1.15em);
+  margin-bottom: 40px;
+}
+.enter-link {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: max(0.75rem, 0.8em);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gold-soft);
+  transition: gap 0.2s ease, border-color 0.2s ease;
+}
+.enter-link:hover { gap: 22px; border-color: var(--gold); }
+.enter-link svg { width: 16px; height: 16px; }
+
+/* ---------- four-up feature row (home) ---------- */
+.feature-row {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(243,239,230,0.1);
+  padding: 34px 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 36px;
+}
+.feature-row.container { padding-left: 32px; padding-right: 32px; }
+.feature {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.feature .f-icon { color: var(--gold); flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; }
+.feature h4 {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.feature p { font-size: 0.85rem; color: var(--paper-faint); }
+@media (max-width: 900px) { .feature-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .feature-row { grid-template-columns: 1fr; } }
+
+/* ---------- XLounge: initiative logo row ---------- */
+.initiative-row {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(243,239,230,0.1);
+  background: rgba(6,5,4,0.58);
+}
+.initiative-row .container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 32px;
+}
+.initiative-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 30px 22px;
+  border-left: 1px solid rgba(243,239,230,0.1);
+  transition: background 0.15s ease;
+}
+.initiative-item:first-child { border-left: none; padding-left: 0; }
+.initiative-item:hover { background: rgba(201,151,63,0.06); }
+.initiative-item .init-icon { color: var(--gold); flex-shrink: 0; width: 26px; height: 26px; }
+.initiative-item .init-text h4 {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+.initiative-item .init-text span {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+@media (max-width: 900px) {
+  .initiative-row .container { grid-template-columns: repeat(2, 1fr); padding: 0 32px; }
+  .initiative-item:nth-child(3) { border-left: none; }
+}
+@media (max-width: 560px) {
+  .initiative-row .container { grid-template-columns: 1fr; }
+  .initiative-item { border-left: none !important; border-top: 1px solid rgba(243,239,230,0.1); padding-left: 0; }
+  .initiative-item:first-child { border-top: none; }
+}
+
+/* ---------- sections below the fold ---------- */
+section.block { padding: 96px 0; position: relative; z-index: 1; }
+.block-head { max-width: 60ch; margin-bottom: 48px; }
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.eyebrow::before { content: ''; width: 26px; height: 1px; background: var(--gold); }
+.block-head h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+  color: var(--paper);
+  margin-bottom: 16px;
+}
+.block-head p { color: var(--paper-dim); font-size: 1.02rem; max-width: 62ch; }
+
+.grid { display: grid; gap: 26px; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.card {
+  background: rgba(6,5,4,0.62);
+  border: 1px solid rgba(243,239,230,0.1);
+  border-radius: 2px;
+  padding: 30px;
+}
+.card h3 { font-family: var(--font-sans); font-weight: 600; font-size: 1.05rem; color: var(--paper); margin-bottom: 12px; }
+.card p { color: var(--paper-dim); font-size: 0.92rem; }
+
+/* ---------- pillar row (XSearch approach) ---------- */
+.pillar-row {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(243,239,230,0.1);
+  background: rgba(6,5,4,0.52);
+  padding: 32px 32px 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+.pillar { display: flex; gap: 14px; align-items: flex-start; }
+.pillar .p-icon { color: var(--gold); flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; }
+.pillar h4 { font-family: var(--font-sans); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.pillar p { font-size: 0.85rem; color: var(--paper-faint); }
+@media (max-width: 900px) { .pillar-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .pillar-row { grid-template-columns: 1fr; } }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 30px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn-primary { background: var(--gold); color: var(--ink); }
+.btn-primary:hover { background: #d9a94f; transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--paper); border-color: rgba(243,239,230,0.35); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+.actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* ---------- CTA band ---------- */
+.cta-band {
+  position: relative;
+  z-index: 1;
+  background: rgba(22,18,13,0.72);
+  border-top: 1px solid rgba(243,239,230,0.08);
+  padding: 88px 0;
+  text-align: center;
+}
+.cta-band h2 { font-family: var(--font-serif); font-size: clamp(1.6rem, 3.4vw, 2.3rem); color: var(--paper); max-width: 22ch; margin: 0 auto 32px; }
+.cta-band .eyebrow { justify-content: center; }
+
+/* ---------- footer ---------- */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  padding: 32px 0;
+  border-top: 1px solid rgba(243,239,230,0.08);
+  background: rgba(6,5,4,0.62);
+}
+.site-footer .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--paper-faint);
+}
+.site-footer a { color: var(--gold); }
+
+/* ==========================================================================
+   CHOOSE SCREEN (enter.html)
+   Built on the landing page's stage, so the artwork sits at exactly the same
+   size and position on both — same fit, same centring, so the baked logo
+   lands in the same place. The choices are laid straight onto the artwork's
+   black left field with NO panel fill behind them: any translucent backing
+   tints the photograph and discolours it.
+   ========================================================================== */
+
+/* This artwork's baked logo centres at 7.62% of its height (the landing's is
+   at 7.3%), so the top bar gets its own offset here. */
+.art-topbar--enter { top: 4.72%; }
+
+/* Slightly higher type floor than the landing, whose copy is baked into the
+   image — this page's copy is live text and has to stay readable. The floor
+   only bites on small viewports, where it makes the overlay large relative
+   to the artwork, so the spacing below is kept tight to compensate. */
+.enter-body .stage-inner {
+  font-size: max(10px, calc(min(var(--vw), 100vh * var(--art-ar)) / 100));
+}
+
+.choose-overlay {
+  position: absolute;
+  left: 6.8%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4em;
+}
+.choice { display: block; }
+.choice-mark { display: block; margin-bottom: 0.85em; color: var(--gold); }
+.choice-mark svg { width: 2.3em; height: 2.3em; display: block; }
+.choice-mark img { height: 3.2em; width: auto; display: block; }
+.choice-name {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 2em;
+  line-height: 1.1;
+  color: var(--paper);
+  margin-bottom: 0.3em;
+}
+.choice-desc {
+  display: block;
+  font-size: 0.9em;
+  line-height: 1.45;
+  color: var(--paper-dim);
+  max-width: 32em;
+  margin-bottom: 0.7em;
+}
+.choice-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  font-size: 0.76em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  transition: gap 0.2s ease;
+}
+.choice-cta svg { width: 1.1em; height: 1.1em; }
+.choice:hover .choice-cta { gap: 1.5em; }
+.choice:hover .choice-name { color: var(--gold); }
+.choice:focus-visible { outline: 2px solid var(--gold); outline-offset: 10px; }
+
+.text-center { text-align: center; }
