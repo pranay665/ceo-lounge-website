@@ -185,27 +185,9 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   align-items: center;
   justify-content: flex-end;
 }
-.art-contact {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: 0.8em;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--paper-dim);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.85em;
-  transition: color 0.2s ease;
-}
-.art-contact::after {
-  content: '';
-  width: 2.1em;
-  height: 1px;
-  background: var(--paper-faint);
-  transition: background 0.2s ease;
-}
-.art-contact:hover { color: var(--gold); }
-.art-contact:hover::after { background: var(--gold); }
+/* The top-right link treatment is defined once, under "top-right nav link"
+   below, and shared by .art-contact (stage pages) and .top-link (content
+   pages) so Back reads identically everywhere. */
 
 .art-enter {
   position: absolute;
@@ -242,13 +224,24 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   /* --art-h is inherited from .site-bg, so the links track the artwork's
      rendered height. The artwork is centred in the first viewport, so the
      offset above it counts toward the baked logo's line as well. */
-  padding: calc((100vh - var(--art-h)) / 2 + var(--art-h) * 0.0762 - 10px) 0 26px;
+  padding: calc((100vh - var(--art-h)) / 2 + var(--art-h) * 0.0762) 0 26px;
+  font-size: var(--u);   /* same unit the stage pages size their link from */
 }
+/* Pinned to 4% in from the artwork's right edge — the same inset .art-topbar
+   uses on the landing and enter screens, rather than the content column's
+   right edge, which sits much further left. */
 .site-header .container {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 28px;
+  max-width: none;
+  margin-right: calc((100% - var(--art-w)) / 2 + var(--art-w) * 0.04);
+  padding-right: 0;   /* the inset above already places it; .container's 32px would add to it */
+  /* The padding above puts the container's top on the baked logo's line;
+     shifting up by half its own height centres it there exactly, whatever
+     the link's rendered height turns out to be. */
+  transform: translateY(-50%);
 }
 .brand-ceo {
   display: inline-flex;
@@ -271,31 +264,36 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   border-bottom: 1px solid var(--gold);
   padding-bottom: 4px;
 }
-.top-link {
+/* ---------- top-right nav link ----------
+   One treatment for every page: the label followed by a short rule, as in
+   the brand mockups. Both the stage pages (.art-contact) and the content
+   pages (.top-link) use it, and both size off the same artwork-derived unit,
+   so Back sits at the same size and position throughout. */
+.top-link,
+.art-contact {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.8em);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--paper-dim);
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.85em;
   transition: color 0.2s ease;
 }
-.top-link::after {
+.top-link::after,
+.art-contact::after {
   content: '';
-  width: 26px; height: 1px;
+  width: 2.1em;
+  height: 1px;
   background: var(--paper-faint);
+  transition: background 0.2s ease;
 }
-.top-link:hover { color: var(--gold); }
-.top-link:hover::after { background: var(--gold); }
-.top-link--back::after { display: none; content: none; }
-.top-link--back::before {
-  content: '\2190';
-  margin-right: -2px;
-}
-.top-nav { display: flex; align-items: center; gap: 32px; }
+.top-link:hover,
+.art-contact:hover { color: var(--gold); }
+.top-link:hover::after,
+.art-contact:hover::after { background: var(--gold); }
 
 /* ---------- brand mark: bracket-X, tinted per sub-brand ---------- */
 .brand-mark {
@@ -750,15 +748,32 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .exp-card:hover .watch { gap: 16px; border-color: var(--gold); }
 
 /* ---------- format: image beside copy ---------- */
+/* The image column stretches to the height of the copy beside it so their
+   top and bottom edges line up; centring instead left it 79px short, inset
+   ~39px at each end. The picture fills that box with `cover`. */
 .format-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 56px;
-  align-items: center;
+  align-items: stretch;
 }
-.format-split .shot { border: 1px solid rgba(243,239,230,0.1); overflow: hidden; }
-.format-split .shot img { width: 100%; height: auto; display: block; }
-@media (max-width: 820px) { .format-split { grid-template-columns: 1fr; gap: 32px; } }
+.format-split .shot {
+  border: 1px solid rgba(243,239,230,0.1);
+  overflow: hidden;
+  min-height: 100%;
+}
+.format-split .shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+@media (max-width: 820px) {
+  .format-split { grid-template-columns: 1fr; gap: 32px; }
+  /* stacked: no neighbouring column to match, so give it a fixed ratio */
+  .format-split .shot { min-height: 0; aspect-ratio: 16 / 7; }
+}
 
 /* ---------- contact panel ---------- */
 .contact-panel {
