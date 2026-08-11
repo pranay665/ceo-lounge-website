@@ -17,10 +17,7 @@
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Wide, to match the mockups, which run content to roughly 4.6% margins.
-     Paragraphs are held to a readable measure individually (max-width in ch)
-     rather than by squeezing the whole column. */
-  --container: 1400px;
+  --container: 1180px;
 
   /* Usable viewport width, which the artwork is sized from. `scrollbar-gutter:
      stable` on <html> above makes this consistent between pages that scroll
@@ -52,7 +49,6 @@ p { margin: 0; }
 button { font-family: inherit; }
 
 .container {
-  width: 100%;   /* without this, auto margins shrink-wrap it inside flex parents */
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 32px;
@@ -103,7 +99,7 @@ button { font-family: inherit; }
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(3,2,2,0) 62%, rgba(3,2,2,0.85) 92%, #030202 100%),
-    linear-gradient(90deg, rgba(3,2,2,0.72) 0%, rgba(3,2,2,0.42) 45%, rgba(3,2,2,0.22) 72%, rgba(3,2,2,0.1) 100%);
+    linear-gradient(90deg, rgba(3,2,2,0.72) 0%, rgba(3,2,2,0.35) 42%, rgba(3,2,2,0) 66%);
 }
 
 /* ---------- real XSearch logo (white lockup, for dark grounds) ----------
@@ -304,7 +300,7 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   justify-content: center;
   font-size: var(--u);
 }
-.hero .container { position: relative; z-index: 1; padding: 22px 32px 60px; }
+.hero .container { position: relative; z-index: 1; padding: 40px 32px 64px; }
 .hero-eyebrow {
   font-family: var(--font-sans);
   font-size: max(0.7rem, 0.75em);
@@ -524,25 +520,20 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 
 /* ==========================================================================
    CHOOSE SCREEN (enter.html)
-   Built on the landing page's stage, so the artwork sits at exactly the same
-   size and position on both — same fit, same centring, so the baked logo
-   lands in the same place. The choices are laid straight onto the artwork's
-   black left field with NO panel fill behind them: any translucent backing
-   tints the photograph and discolours it.
+   Two panels divided down the middle, laid straight onto the artwork with NO
+   panel fill behind them: any translucent backing tints the photograph and
+   discolours it. Sized in em off --u so the composition scales with the
+   viewport.
    ========================================================================== */
 
-/* The enter screen is one screen: the wrapper becomes a flex column so the
-   main region takes exactly the height the header leaves, rather than
-   guessing at it and leaving slack at the foot. */
-.site-bg--enter { display: flex; flex-direction: column; }
+/* Fills the screen beneath the header and centres the panels within it. */
 .enter-main {
   position: relative;
   z-index: 1;
-  flex: 1;
+  min-height: calc(100vh - 150px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: 3vh;
   font-size: var(--u);
 }
 .split {
@@ -601,7 +592,10 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .split-choice:focus-visible { outline: 2px solid var(--gold); outline-offset: 8px; }
 
 .split-tagline {
-  margin-top: 4.5em;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 90%;
   text-align: center;
   font-size: max(10px, 0.92em);
   font-weight: 500;
@@ -621,8 +615,8 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
    ========================================================================== */
 
 /* Small brand lockup above the hero headline */
-.brand-lockup { display: inline-block; margin-bottom: 1.2em; }
-.brand-lockup img { height: max(40px, 3.4em); width: auto; }
+.brand-lockup { display: inline-block; margin-bottom: 1.6em; }
+.brand-lockup img { height: max(44px, 4.2em); width: auto; }
 
 .rule-gold {
   display: block;
