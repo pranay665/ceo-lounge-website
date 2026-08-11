@@ -525,18 +525,6 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
 .actions { display: flex; gap: 16px; flex-wrap: wrap; }
 
-/* ---------- CTA band ---------- */
-.cta-band {
-  position: relative;
-  z-index: 1;
-  background: rgba(22,18,13,0.72);
-  border-top: 1px solid rgba(243,239,230,0.08);
-  padding: 88px 0;
-  text-align: center;
-}
-.cta-band h2 { font-family: var(--font-serif); font-size: clamp(1.6rem, 3.4vw, 2.3rem); color: var(--paper); max-width: 22ch; margin: 0 auto 32px; }
-.cta-band .eyebrow { justify-content: center; }
-
 /* ---------- footer ---------- */
 .site-footer {
   position: relative;
