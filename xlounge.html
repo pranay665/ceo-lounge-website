@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=19">
+<link rel="stylesheet" href="css/style.css?v=37">
 </head>
 <body>
 
@@ -24,7 +24,7 @@
 
   <main>
 
-    <section class="hero" style="min-height:62vh;">
+    <section class="hero">
       <div class="container">
         <span class="brand-lockup">
           <img src="assets/images/logo/xlounge-logo-white.png" alt="X Lounge">
@@ -47,18 +47,7 @@
             <p>X Lounge builds the format around the objective, bringing together CXOs, founders, investors and businesses through conversations and experiences designed for that particular context.</p>
           </div>
           <div class="radar" aria-hidden="true">
-            <svg viewBox="0 0 220 220" fill="none" stroke="currentColor">
-              <circle cx="110" cy="110" r="105" stroke-width="0.6" opacity="0.35"/>
-              <circle cx="110" cy="110" r="78"  stroke-width="0.6" opacity="0.45"/>
-              <circle cx="110" cy="110" r="52"  stroke-width="0.6" opacity="0.55"/>
-              <circle cx="110" cy="110" r="26"  stroke-width="0.6" opacity="0.7"/>
-              <path d="M110 5v210M5 110h210" stroke-width="0.4" opacity="0.22"/>
-              <circle cx="163" cy="72"  r="2.6" fill="currentColor" stroke="none" opacity="0.9"/>
-              <circle cx="62"  cy="140" r="2.2" fill="currentColor" stroke="none" opacity="0.75"/>
-              <circle cx="148" cy="160" r="2"   fill="currentColor" stroke="none" opacity="0.6"/>
-              <circle cx="80"  cy="58"  r="1.8" fill="currentColor" stroke="none" opacity="0.5"/>
-              <path d="M96 96l28 28M124 96l-28 28" stroke-width="2.4" stroke-linecap="round"/>
-            </svg>
+            <canvas class="radar-canvas"></canvas>
           </div>
         </div>
       </div>
@@ -74,44 +63,48 @@
         <div class="exp-grid">
 
           <article class="exp-card">
-            <div class="shot"><img src="assets/images/lounge/cricket.jpg" alt="CXOs on the field at the CEO Cricket Challenge"></div>
+            <div class="shot"><img src="assets/images/lounge/cricket.jpg?v=2" alt="CXOs on the field at the CEO Cricket Challenge"></div>
             <div class="body">
               <h3>CEO Cricket Challenge</h3>
               <p>A day on the ground that brings CXOs together and gives business conversations room to happen naturally.</p>
-              <a href="#contact" class="watch">Watch
+              <a href="https://www.youtube.com/watch?v=jl3CqXbD2oI&amp;t=163s" target="_blank" rel="noopener noreferrer"
+                 aria-label="Watch the CEO Cricket Challenge film on YouTube (opens in a new tab)" class="watch">Watch
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>
             </div>
           </article>
 
           <article class="exp-card">
-            <div class="shot"><img src="assets/images/lounge/chef.jpg" alt="Cooking together at CEO Chef de Cuisine"></div>
+            <div class="shot"><img src="assets/images/lounge/chef.jpg?v=2" alt="Cooking together at CEO Chef de Cuisine"></div>
             <div class="body">
               <h3>CEO Chef de Cuisine</h3>
               <p>CXOs step behind the counter with their spouses, cook together and discover each other beyond the boardroom.</p>
-              <a href="#contact" class="watch">Watch
+              <a href="https://www.youtube.com/watch?v=zW4P4byPMak" target="_blank" rel="noopener noreferrer"
+                 aria-label="Watch the CEO Chef de Cuisine film on YouTube (opens in a new tab)" class="watch">Watch
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>
             </div>
           </article>
 
           <article class="exp-card">
-            <div class="shot"><img src="assets/images/lounge/iconfluence.jpg" alt="A panel conversation on stage at Iconfluence"></div>
+            <div class="shot"><img src="assets/images/lounge/iconfluence.jpg?v=2" alt="A panel conversation on stage at Iconfluence"></div>
             <div class="body">
               <h3>Iconfluence</h3>
               <p>A platform built around ideas, perspectives and the people influencing where business moves next.</p>
-              <a href="#contact" class="watch">Watch
+              <a href="https://www.youtube.com/watch?v=LBBF4GLEzLQ" target="_blank" rel="noopener noreferrer"
+                 aria-label="Watch the CEO Iconfluence film on YouTube (opens in a new tab)" class="watch">Watch
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>
             </div>
           </article>
 
           <article class="exp-card">
-            <div class="shot"><img src="assets/images/lounge/roundtables.jpg" alt="A private dinner table set for a roundtable"></div>
+            <div class="shot"><img src="assets/images/lounge/roundtables.jpg?v=2" alt="A private dinner table set for a roundtable"></div>
             <div class="body">
               <h3>Roundtables &amp; more</h3>
               <p>Conversations, private dinners, podcasts and bespoke experiences designed around what you want to achieve.</p>
-              <a href="#contact" class="watch">Watch
+              <a href="https://www.youtube.com/watch?v=SjS1Ne0492Q" target="_blank" rel="noopener noreferrer"
+                 aria-label="Watch the CEO Awards film on YouTube (opens in a new tab)" class="watch">Watch
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>
             </div>
@@ -125,7 +118,7 @@
       <div class="container">
         <div class="format-split">
           <div class="shot">
-            <img src="assets/images/lounge/format.jpg" alt="A roundtable seen from above">
+            <img src="assets/images/lounge/format.jpg?v=3" alt="A roundtable seen from above">
           </div>
           <div class="section-head">
             <span class="rule-gold"></span>
@@ -143,18 +136,22 @@
           <div>
             <h2>Who do you need in the room?</h2>
             <p class="sub">Tell us what you're trying to make happen.</p>
-            <a href="mailto:hello@ceolounge.com" class="link-arrow">Start a conversation
+            <a href="mailto:hari@ceolounge.net" class="link-arrow">Start a conversation
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
           </div>
           <ul class="contact-list">
             <li>
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9.5h4V21H3zM10 9.5h3.8v1.6h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.3c0-1.27-.02-2.9-1.8-2.9-1.8 0-2.08 1.38-2.08 2.81V21h-4z"/></svg>
+              <a href="https://www.linkedin.com/in/harigovindnair/" target="_blank" rel="noopener noreferrer">Hari Govind Nair</a>
+            </li>
+            <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 6.5l9 6 9-6"/></svg>
-              <a href="mailto:hello@ceolounge.com">hello@ceolounge.com</a>
+              <a href="mailto:hari@ceolounge.net">hari@ceolounge.net</a>
             </li>
             <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3.5h4l2 5-2.5 1.5a12 12 0 005.5 5.5L15.5 13l5 2v4a1.5 1.5 0 01-1.7 1.5A17 17 0 013.5 5.2 1.5 1.5 0 015 3.5z"/></svg>
-              <a href="tel:+919810012345">+91 98100 12345</a>
+              <a href="tel:+919811476141">+91 98114 76141</a>
             </li>
             <li>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
@@ -167,17 +164,15 @@
 
   </main>
 
-  <footer class="page-footer">
+  <footer class="site-footer">
     <div class="container">
-      <span>&copy; <span data-year></span> CEO Lounge</span>
-      <span class="legal">
-        <a href="#">Terms of Use</a>
-        <a href="#">Privacy Policy</a>
-      </span>
+      <span>&copy; <span data-year></span> X Lounge. All rights reserved.</span>
+      <span>Part of <a href="index.html">CEO Lounge</a></span>
     </div>
   </footer>
 </div>
 
 <script src="js/main.js?v=3"></script>
+<script src="js/radar.js?v=1"></script>
 </body>
 </html>

@@ -75,6 +75,13 @@ button { font-family: inherit; }
      and clamped, so hero type still scales but no longer depends on the
      artwork's fitted size. */
   --u: clamp(11px, 1.05vw, 17px);
+  /* Header's own height: its top padding plus the brand mark. The hero
+     subtracts this so it fills the first screen exactly. */
+  --header-h: calc(34px + clamp(26px, 2.1vw, 34px));
+  /* Rendered width of the artwork. The background is `contain` inside a
+     100vw x 100vh box, so this is its fitted width — used to keep the enter
+     screen's panels clear of the lit doorway. */
+  --art-w: min(100vw, calc(100vh * 1.499));
 }
 .site-bg::before {
   content: '';
@@ -85,8 +92,12 @@ button { font-family: inherit; }
   height: 100vh;
   z-index: 0;
   background-image: url('../assets/images/door.jpg');
-  background-size: cover;
-  background-position: 68% center;
+  /* `contain` inside this 100vw x 100vh box reproduces the landing page's fit
+     exactly — the landing sizes its artwork to min(vw, vh * 1.499) too — so
+     the door renders at the same scale on every page. `cover` was scaling it
+     up to fill the width, which read as zoomed in against home. */
+  background-size: contain;
+  background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
 }
@@ -101,18 +112,17 @@ button { font-family: inherit; }
   height: 100vh;
   z-index: 0;
   pointer-events: none;
+  /* Lighter than before: now the artwork is fitted rather than blown up, it
+     reads closer to the landing page, which carries no scrim at all. Enough
+     is kept to hold contrast under the live copy. */
   background:
-    linear-gradient(180deg, rgba(3,2,2,0) 62%, rgba(3,2,2,0.85) 92%, #030202 100%),
-    linear-gradient(90deg, rgba(3,2,2,0.72) 0%, rgba(3,2,2,0.42) 45%, rgba(3,2,2,0.22) 72%, rgba(3,2,2,0.1) 100%);
+    linear-gradient(180deg, rgba(3,2,2,0) 66%, rgba(3,2,2,0.8) 93%, #030202 100%),
+    linear-gradient(90deg, rgba(3,2,2,0.5) 0%, rgba(3,2,2,0.28) 45%, rgba(3,2,2,0.12) 72%, rgba(3,2,2,0) 100%);
 }
 
-/* ---------- real XSearch logo (white lockup, for dark grounds) ----------
-   Sits in the hero, not the top-left corner: the baked CEO LOUNGE mark in
-   the background artwork already owns that spot. */
-.xsearch-logo img { height: 64px; width: auto; }
-.xsearch-logo--hero { display: inline-block; margin-bottom: 26px; }
-.xsearch-logo--hero img { height: max(64px, 6.4em); }   /* tracks the hero's --u */
-.choose-mark--img img { height: 96px; width: auto; }
+/* Both hero lockups use .brand-lockup so X Lounge and X Search render at the
+   same size; their source files carry near-identical proportions (the mark is
+   78.0% and 77.7% of each file's height), so one height suits both. */
 
 /* ==========================================================================
    LANDING — full-bleed composed artwork.
@@ -123,11 +133,15 @@ button { font-family: inherit; }
    ========================================================================== */
 :root { --art-ar: 1.499; }         /* 1535 / 1024 */
 
-html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
+.landing-body { background: #030202; }
 
+/* One full screen of artwork, with the contact section scrolling in beneath.
+   It used to be position:absolute with the page locked against scrolling;
+   now it holds its own height so content can follow it. */
 .stage {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  height: 100vh;
   /* Matches the artwork's own perimeter, which is pure black (measured max
      luminance 1-13 on all four edges), so the fit is seamless. */
   background: #000;
@@ -175,19 +189,70 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   top: 70%;
   font-family: var(--font-sans);
   font-weight: 500;
-  font-size: 0.85em;
+  font-size: max(13px, 1.12em);
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--gold);
   display: inline-flex;
   align-items: center;
   gap: 1.2em;
-  padding-bottom: 0.6em;
+  padding-bottom: 0.65em;
   border-bottom: 1px solid var(--gold-soft);
   transition: gap 0.2s ease, border-color 0.2s ease;
 }
 .art-enter svg { width: 1.25em; height: 1.25em; }
 .art-enter:hover { gap: 1.7em; border-color: var(--gold); }
+
+/* ---------- Enter: glow and glitter ----------
+   `isolation: isolate` gives the link its own stacking context, so the
+   z-index:-1 layers below sit behind its text without dropping behind the
+   artwork itself. Without it they would paint under the photograph. */
+.art-enter {
+  isolation: isolate;
+  text-shadow: 0 0 14px rgba(201,151,63,0.35);
+  transition: gap 0.2s ease, border-color 0.2s ease, text-shadow 0.3s ease;
+}
+.art-enter:hover { text-shadow: 0 0 18px rgba(224,181,106,0.6); }
+
+/* soft halo, breathing slowly */
+.art-enter::before {
+  content: '';
+  position: absolute;
+  left: -1.7em;
+  right: -1.7em;
+  top: -1.15em;
+  bottom: -0.7em;
+  z-index: -1;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center,
+              rgba(201,151,63,0.26) 0%, rgba(201,151,63,0.10) 45%, transparent 72%);
+  filter: blur(5px);
+  pointer-events: none;
+  animation: enterHalo 4.6s ease-in-out infinite;
+}
+@keyframes enterHalo {
+  0%, 100% { opacity: 0.55; transform: scale(0.97); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+
+/* Canvas host for the specks (js/sparkle.js). Fixed background positions
+   could only twinkle the same dots in place; each speck is now born, glows
+   and dies somewhere new. */
+.art-enter .spark {
+  position: absolute;
+  inset: -0.7em -1.05em;   /* kept close to the link rather than spread wide */
+  z-index: -1;
+  pointer-events: none;
+}
+.art-enter .spark canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-enter::before { animation: none; }
+}
 
 .art-topbar a:focus-visible,
 .art-enter:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; }
@@ -296,9 +361,12 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
    unit the landing's baked headline was set at, so the headline matches
    across pages instead of running ~50% larger from its old 5vw rule. The
    max() floors keep everything readable once the artwork gets small. */
+/* Fills the first screen exactly, so the following section starts at the fold
+   rather than creeping up into it. Content is centred in that space, which
+   also opens up the gap beneath the hero's call to action. */
 .hero {
   position: relative;
-  min-height: 82vh;
+  min-height: calc(100vh - var(--header-h));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -314,11 +382,21 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
   margin-bottom: 20px;
   display: block;
 }
+/* max-width was 15ch — narrower than the headline sentences themselves, which
+   run to 25 characters, so each one broke over two lines. Wide enough now for
+   a sentence to sit on a single line; the .accent span below is display:block,
+   so the second sentence still starts its own line. */
+/* Each headline sentence must sit on a single line. The longest is 25
+   characters, and Playfair averages ~0.437em per character here (measured),
+   so the second term is the largest size at which 25 characters still fit the
+   content column — it only takes over once the column gets too narrow for the
+   3.8em display size. The .accent span is display:block, so the second
+   sentence still starts its own line. */
 .hero h1 {
   font-family: var(--font-serif);
-  font-size: max(2rem, 4em);
-  line-height: 1.14;
-  max-width: 15ch;
+  font-size: min(3.8em, calc((min(1400px, 100vw) - 68px) / 11.5));
+  line-height: 1.16;
+  max-width: 30ch;
   color: var(--paper);
   margin-bottom: 26px;
 }
@@ -426,6 +504,9 @@ html:has(.landing-body), .landing-body { height: 100%; overflow: hidden; }
 
 /* ---------- sections below the fold ---------- */
 section.block { padding: 96px 0; position: relative; z-index: 1; }
+/* The pillar row already ends the hero with its own padding and a rule, so a
+   full 96px on top of that opened an oversized gap before the next heading. */
+.hero:has(.pillar-row) + .block { padding-top: 44px; }
 .block-head { max-width: 60ch; margin-bottom: 48px; }
 .eyebrow {
   font-family: var(--font-sans);
@@ -463,12 +544,15 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .card p { color: var(--paper-dim); font-size: 0.92rem; }
 
 /* ---------- pillar row (XSearch approach) ---------- */
-.pillar-row {
+/* Selector carries .container as well because .pillar-row sits on a container
+   element, and `.hero .container` (0,2,0) would otherwise win and impose the
+   hero's 60px bottom padding here instead of this row's own. */
+.hero .container.pillar-row {
   position: relative;
   z-index: 1;
   border-top: 1px solid rgba(243,239,230,0.1);
   background: rgba(6,5,4,0.52);
-  padding: 32px 32px 24px;
+  padding: 32px 32px 18px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 32px;
@@ -478,8 +562,9 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .pillar .p-icon { color: var(--gold); flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; }
 .pillar h4 { font-family: var(--font-sans); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 .pillar p { font-size: 0.85rem; color: var(--paper-faint); }
-@media (max-width: 900px) { .pillar-row { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .pillar-row { grid-template-columns: 1fr; } }
+/* Must match the base selector's specificity or the 4-column rule wins. */
+@media (max-width: 900px) { .hero .container.pillar-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .hero .container.pillar-row { grid-template-columns: 1fr; } }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -545,9 +630,38 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
   padding-bottom: 3vh;
   font-size: var(--u);
 }
+/* The doorway's light begins around 73% across the artwork, so the panels are
+   confined to the dark field to its left rather than spanning the page. The
+   artwork is centred, hence the leading offset. */
+.site-bg--enter .enter-main > .container {
+  max-width: none;
+  padding: 0;
+  width: calc(var(--art-w) * 0.645);
+  margin-left: calc((100% - var(--art-w)) / 2 + var(--art-w) * 0.04);
+  margin-right: 0;
+}
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+/* Too narrow for two panels abreast — stack them, but stay inside the
+   artwork's dark left field so they still clear the doorway. Selectors are
+   prefixed to outrank the .split-choice rules defined further down. */
+@media (max-width: 700px) {
+  .site-bg--enter .enter-main > .container { width: calc(var(--art-w) * 0.66); }
+  .split { grid-template-columns: 1fr; row-gap: 3em; }
+  .site-bg--enter .split-choice + .split-choice { border-left: none; }
+  .site-bg--enter .split-choice { padding: 0; }
+}
+/* Small screens: the artwork is a short band and the copy falls below it on
+   plain black, so the doorway is no longer behind the panels — give them the
+   full width back rather than squeezing into a narrow column. */
+@media (max-width: 520px) {
+  .site-bg--enter .enter-main > .container {
+    width: auto;
+    margin-left: 0;
+    padding: 0 28px;
+  }
 }
 .split-choice {
   display: flex;
@@ -651,6 +765,13 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 }
 .radar { display: flex; justify-content: center; }
 .radar svg { width: min(300px, 100%); height: auto; color: var(--gold); }
+/* Animated sweep (js/radar.js). Square by definition — the script sets the
+   pixel height to match the CSS width. */
+.radar-canvas {
+  width: min(300px, 100%);
+  aspect-ratio: 1;
+  display: block;
+}
 @media (max-width: 820px) {
   .objective { grid-template-columns: 1fr; gap: 36px; }
   .radar { order: -1; }
@@ -772,18 +893,88 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .link-arrow svg { width: 16px; height: 16px; }
 .link-arrow:hover { gap: 18px; border-color: var(--gold); }
 
-/* ---------- page footer ---------- */
-.page-footer {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid rgba(243,239,230,0.08);
-  margin-top: 72px;
-  padding: 26px 0;
-  background: rgba(6,5,4,0.62);
+/* .page-footer removed — every page now uses .site-footer, so the footers
+   read identically across the site. */
+
+/* ==========================================================================
+   HOME CONTACT — the two brands side by side, each with its own lead
+   ========================================================================== */
+.contact-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
 }
-.page-footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
-.page-footer, .page-footer a { font-size: 0.78rem; color: var(--paper-faint); }
-.page-footer a:hover { color: var(--gold); }
-.page-footer .legal { display: flex; gap: 22px; align-items: center; }
+@media (max-width: 760px) { .contact-split { grid-template-columns: 1fr; } }
+
+/* Mark with its tagline beneath it on the left, contact details alongside on
+   the right. Grid placement rather than a wrapper element, so the markup
+   stays flat. */
+.contact-col {
+  border: 1px solid rgba(201,151,63,0.28);
+  border-radius: 2px;
+  background: rgba(6,5,4,0.55);
+  padding: 34px 36px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 36px;
+  row-gap: 18px;
+  align-items: start;
+  transition: border-color 0.2s ease;
+}
+.contact-col:hover { border-color: rgba(201,151,63,0.5); }
+
+/* The mark links to its brand page, and its hit area is stretched over the
+   whole card — so the logo and the surrounding empty space both navigate.
+   A wrapping anchor was not an option: the card already contains LinkedIn,
+   email and phone links, and anchors cannot nest. */
+.contact-col { position: relative; cursor: pointer; }
+.contact-col .brand-link {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  display: inline-block;
+}
+.contact-col .brand-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.contact-col .brand-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; }
+/* Only the real links ride above the overlay, so the rest of the details
+   column still navigates to the brand page. */
+.contact-col .contact-list a { position: relative; z-index: 2; }
+.contact-col .brand {
+  height: 84px;
+  width: auto;          /* fixed height + stretch would distort the mark */
+  display: block;
+  transition: opacity 0.2s ease;
+}
+.contact-col:hover .brand { opacity: 0.88; }
+.contact-col .tag {
+  grid-column: 1;
+  grid-row: 2;
+  color: var(--paper);
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 24ch;
+}
+/* spans both rows so it sits centred against the mark and its tagline */
+.contact-col .contact-list {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* Below this the two columns squeeze the tagline into a hyphenated sliver and
+   the details column can no longer hold an email address, so stack it. */
+@media (max-width: 620px) {
+  .contact-col { grid-template-columns: 1fr; row-gap: 20px; }
+  /* the anchor is the grid item, not the image */
+  .contact-col .brand-link { grid-column: 1; grid-row: 1; }
+  .contact-col .brand { height: 70px; }
+  .contact-col .tag { grid-column: 1; grid-row: 2; }
+  .contact-col .contact-list { grid-column: 1; grid-row: 3; align-self: start; }
+}
 
 .text-center { text-align: center; }
