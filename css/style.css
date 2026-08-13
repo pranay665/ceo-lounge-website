@@ -66,9 +66,15 @@ button { font-family: inherit; }
    it, which left ~118px of dead bar down each side, a 243px gap above the
    headline and an off-centre content column. The artwork can now simply
    cover the first screen, and content uses the ordinary centred container. */
+/* On a phone, 100vh measures the screen as if the browser's address bar were
+   already scrolled away, so a 100vh hero is taller than what you can actually
+   see and its foot starts life hidden. svh is that same screen with the bar
+   still showing — the honest number on first paint. The plain vh line stays
+   ahead of it for browsers that don't know the unit. */
 .site-bg {
   position: relative;
   min-height: 100vh;
+  min-height: 100svh;
   background: #030202;
   overflow: hidden;
   /* Typographic unit, previously 1% of the artwork width. Now viewport-based
@@ -90,6 +96,7 @@ button { font-family: inherit; }
   left: 0;
   right: 0;
   height: 100vh;
+  height: 100svh;
   z-index: 0;
   background-image: url('../assets/images/door.jpg');
   /* `contain` inside this 100vw x 100vh box reproduces the landing page's fit
@@ -110,6 +117,7 @@ button { font-family: inherit; }
   left: 0;
   right: 0;
   height: 100vh;
+  height: 100svh;
   z-index: 0;
   pointer-events: none;
   /* Lighter than before: now the artwork is fitted rather than blown up, it
@@ -142,6 +150,7 @@ button { font-family: inherit; }
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100svh;
   /* Matches the artwork's own perimeter, which is pure black (measured max
      luminance 1-13 on all four edges), so the fit is seamless. */
   background: #000;
@@ -324,6 +333,11 @@ button { font-family: inherit; }
   align-items: center;
   gap: 0.85em;
   transition: color 0.2s ease;
+  /* The label itself is only ~18px tall — fine for a cursor, under half a
+     fingertip. The padding buys a 44px touch target without moving the text:
+     it is taken back out with an equal negative margin. */
+  padding: 13px 0;
+  margin: -13px 0;
 }
 .top-link::after,
 .art-contact::after {
@@ -364,22 +378,44 @@ button { font-family: inherit; }
 /* Fills the first screen exactly, so the following section starts at the fold
    rather than creeping up into it. Content is centred in that space, which
    also opens up the gap beneath the hero's call to action. */
+/* --u is derived from the viewport's width alone, which is fine until a window
+   is wide but short: the hero then asks for more height than there is and the
+   copy runs past the fold. --hs takes the smaller of the two readings, so on a
+   short window the whole hero scales down together and keeps its proportions,
+   while on a normally-tall one it is exactly --u and nothing changes. The px
+   floor stops it shrinking past readable. */
 .hero {
   position: relative;
+  --hs: max(11px, min(var(--u), 1.9vh));
+  display: flex;
+  flex-direction: column;
+  font-size: var(--hs);
+}
+/* The first screen belongs to the copy. Anything after it in the hero — the
+   pillar row on X Search — follows below the fold rather than being squeezed
+   into the same screen alongside it. */
+.hero > .container:not(.pillar-row) {
   min-height: calc(100vh - var(--header-h));
+  min-height: calc(100svh - var(--header-h));
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: var(--u);
 }
-.hero .container { position: relative; z-index: 1; padding: 22px 32px 60px; }
+/* Spacing scales with --hs too, or the gaps would stay put while the type
+   around them shrank. The multipliers reproduce the original px values at
+   full size. */
+.hero .container {
+  position: relative;
+  z-index: 1;
+  padding: calc(var(--hs) * 1.47) 32px calc(var(--hs) * 1.6);
+}
 .hero-eyebrow {
   font-family: var(--font-sans);
   font-size: max(0.7rem, 0.75em);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 20px;
+  margin-bottom: calc(var(--hs) * 1.34);
   display: block;
 }
 /* max-width was 15ch — narrower than the headline sentences themselves, which
@@ -398,7 +434,7 @@ button { font-family: inherit; }
   line-height: 1.16;
   max-width: 30ch;
   color: var(--paper);
-  margin-bottom: 26px;
+  margin-bottom: calc(var(--hs) * 1.74);
 }
 .hero h1 .accent { color: var(--gold); display: block; }
 .hero-rule { width: 46px; height: 1px; background: rgba(243,239,230,0.3); margin-bottom: 24px; }
@@ -406,8 +442,12 @@ button { font-family: inherit; }
   max-width: 48ch;
   color: var(--paper-dim);
   font-size: max(1rem, 1.15em);
-  margin-bottom: 40px;
+  margin-bottom: calc(var(--hs) * 2.67);
 }
+/* Where the hero copy runs to more than one paragraph, only the last keeps the
+   full gap down to the buttons; the rest sit at reading distance from each
+   other. */
+.hero .lede:not(:last-of-type) { margin-bottom: calc(var(--hs) * 1.2); }
 .enter-link {
   font-family: var(--font-sans);
   font-weight: 500;
@@ -424,6 +464,132 @@ button { font-family: inherit; }
 }
 .enter-link:hover { gap: 22px; border-color: var(--gold); }
 .enter-link svg { width: 16px; height: 16px; }
+
+/* ==========================================================================
+   LANDING, PHONE
+   Every word on the landing artwork is baked into the picture, and the picture
+   may not be cropped, so on a 375px screen it fits to a 375x250 band with the
+   feature captions at around four pixels tall. Below the breakpoint the
+   artwork gives way to the same copy set as text, over the door photograph
+   the sub-brand pages already use, so the three pages read as one site.
+   ========================================================================== */
+.stage-copy { display: none; }
+
+@media (max-width: 760px) {
+  /* Height comes from the copy now; the screen is only a floor. */
+  .stage {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+  }
+  .stage-inner { display: none; }
+
+  .stage::before,
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .stage::before {
+    background: url('../assets/images/door.jpg') center / cover no-repeat;
+    opacity: 0.5;
+  }
+  /* The doorway sits right of centre in the photograph, so the copy column
+     needs its own ground to stay legible across it. */
+  .stage::after {
+    background:
+      linear-gradient(180deg, rgba(3,2,2,0.62) 0%, rgba(3,2,2,0.55) 40%, rgba(3,2,2,0.9) 82%, #030202 100%);
+  }
+
+  .stage-copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 26px 24px 44px;
+  }
+  .stage-copy-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .stage-copy-brand { height: 26px; width: auto; display: block; }
+
+  .stage-copy h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(31px, 8.7vw, 40px);
+    line-height: 1.16;
+    color: var(--paper);
+    margin-bottom: 22px;
+  }
+  .stage-copy h1 .accent { color: var(--gold); display: block; }
+  .stage-copy .hero-rule { margin-bottom: 20px; }
+
+  .stage-copy-lede {
+    max-width: 52ch;
+    color: var(--paper-dim);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .stage-copy-services {
+    color: var(--paper-faint);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 34px;
+  }
+  .stage-copy .enter-link { align-self: flex-start; }
+
+  .stage-feats {
+    list-style: none;
+    margin: 44px 0 0;
+    padding: 26px 0 0;
+    border-top: 1px solid rgba(243,239,230,0.1);
+    display: grid;
+    gap: 24px;
+  }
+  .stage-feats li { display: flex; gap: 14px; align-items: flex-start; }
+  .stage-feats .p-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+  }
+  .stage-feats h4 {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .stage-feats p { font-size: 0.85rem; line-height: 1.55; color: var(--paper-faint); }
+}
+
+/* A large phone held sideways, or a small tablet, has room for the features
+   two abreast rather than a single tall column. */
+@media (min-width: 560px) and (max-width: 760px) {
+  .stage-copy { padding: 32px 32px 56px; }
+  .stage-copy h1 { max-width: 22ch; }
+  .stage-feats { grid-template-columns: 1fr 1fr; gap: 28px 32px; }
+}
+
+/* The underlined text links stand about 27px tall, which a cursor hits easily
+   and a fingertip does not. On touch widths the space is added above the label
+   only and taken back out again with a negative margin, so the rule drawn
+   under the words stays exactly where it was. */
+@media (max-width: 760px) {
+  .enter-link,
+  .link-arrow {
+    padding-top: 15px;
+    margin-top: -15px;
+  }
+}
 
 /* ---------- four-up feature row (home) ---------- */
 .feature-row {
@@ -507,6 +673,11 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 /* The pillar row already ends the hero with its own padding and a rule, so a
    full 96px on top of that opened an oversized gap before the next heading. */
 .hero:has(.pillar-row) + .block { padding-top: 44px; }
+/* A hero with no pillar row ends on its call to action, and the hero already
+   fills the screen, so a full 96px on top of that left an oversized gap
+   before the next heading. Specificity keeps the :has rule above winning on
+   X Search. */
+.hero + .block { padding-top: 26px; }
 .block-head { max-width: 60ch; margin-bottom: 48px; }
 .eyebrow {
   font-family: var(--font-sans);
@@ -529,10 +700,11 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .block-head p { color: var(--paper-dim); font-size: 1.02rem; max-width: 62ch; }
 
 .grid { display: grid; gap: 26px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
 
 .card {
   background: rgba(6,5,4,0.62);
@@ -546,7 +718,7 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 /* ---------- pillar row (XSearch approach) ---------- */
 /* Selector carries .container as well because .pillar-row sits on a container
    element, and `.hero .container` (0,2,0) would otherwise win and impose the
-   hero's 60px bottom padding here instead of this row's own. */
+   hero's own padding here instead of this row's. */
 .hero .container.pillar-row {
   position: relative;
   z-index: 1;
@@ -556,7 +728,9 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 32px;
-  margin-top: 48px;
+  /* The copy above now ends exactly at the fold, so this row opens the next
+     screen; its own border and darker ground do the separating. */
+  margin-top: 0;
 }
 .pillar { display: flex; gap: 14px; align-items: flex-start; }
 .pillar .p-icon { color: var(--gold); flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; }
@@ -671,12 +845,64 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
   padding: 0 5%;
 }
 .split-choice + .split-choice { border-left: 1px solid rgba(243,239,230,0.16); }
+/* The mark and the wordmark are separate images so each can be animated on
+   its own. Both keep the source file's full width, so they stay in register
+   when stacked without any horizontal nudging. */
 .split-logo {
-  height: 10.5em;
-  width: auto;
+  display: block;
+  width: 11.2em;
   transition: transform 0.25s ease;
 }
+.split-logo img { display: block; width: 100%; height: auto; }
 .split-choice:hover .split-logo { transform: translateY(-3px); }
+
+/* Two movements in one timeline per element, so there is no seam between
+   them. First the mark settles down from oversized while the wordmark opens
+   out from the centre; then, after a brief hold, the lockup rebalances — the
+   mark eases down and the wordmark grows into it. Both elements finish
+   together, so the rebalance reads as a single gesture.
+
+   Origins are set so the pair keeps its spacing through the second movement:
+   the mark scales about its foot and the wordmark about its head, leaving
+   the gap between them untouched. Timing is per keyframe, hence `linear`
+   at element level. transform-only, so it all stays on the compositor. */
+.split-mark {
+  transform-origin: 50% 100%;
+  animation: markSettle 1.35s linear both;
+}
+.split-word {
+  transform-origin: 50% 0%;
+  /* The blank rows between mark and wordmark were dropped when the source
+     was split, so the original spacing is restored here. Percentage margins
+     resolve against the container's width, matching how the gap scaled in
+     the artwork: 182/1600 and 164/1450, i.e. ~11.3% either way. */
+  margin-top: 11.35%;
+  animation: wordOpen 1.35s linear both;
+}
+/* the second panel follows a beat later */
+.split-choice--second .split-mark,
+.split-choice--second .split-word { animation-delay: 0.08s; }
+
+/* Both halves move from the first frame — the wordmark used to sit out the
+   opening beat, which is what made the reveal feel like it started late. The
+   pause between the two movements is kept short, just long enough to read as
+   two gestures rather than one. */
+@keyframes markSettle {
+  0%   { transform: scale(1.28);      opacity: 0; animation-timing-function: cubic-bezier(0.16, 0.84, 0.32, 1); }
+  33%  { transform: scale(1);         opacity: 1; animation-timing-function: linear; }
+  45%  { transform: scale(1);         opacity: 1; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  100% { transform: scale(0.78);      opacity: 1; }
+}
+@keyframes wordOpen {
+  0%   { transform: scale(0.42, 1);   opacity: 0; animation-timing-function: cubic-bezier(0.16, 0.84, 0.32, 1); }
+  33%  { transform: scale(1, 1);      opacity: 1; animation-timing-function: linear; }
+  45%  { transform: scale(1, 1);      opacity: 1; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  100% { transform: scale(1.26, 1.26); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-mark, .split-word { animation: none; }
+}
 .split-rule {
   display: block;
   width: 7em;
@@ -725,7 +951,7 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 }
 
 @media (max-width: 620px) {
-  .split-logo { height: 8em; }
+  .split-logo { width: 8.5em; }
   .split-rule { margin: 1.2em 0 1.1em; }
   .split-cta { padding-top: 1.5em; }
 }
@@ -841,14 +1067,19 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
 .format-split .shot img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* `contain` rather than `cover`: the frame still takes its height from the
+     copy beside it, but the whole picture stays visible instead of being
+     cropped to fill. */
+  object-fit: contain;
   object-position: center;
   display: block;
 }
 @media (max-width: 820px) {
   .format-split { grid-template-columns: 1fr; gap: 32px; }
-  /* stacked: no neighbouring column to match, so give it a fixed ratio */
-  .format-split .shot { min-height: 0; aspect-ratio: 16 / 7; }
+  /* stacked: no column to match, so let the picture keep its own proportions
+     rather than forcing a ratio that would letterbox it */
+  .format-split .shot { min-height: 0; }
+  .format-split .shot img { height: auto; }
 }
 
 /* ---------- contact panel ---------- */
@@ -975,6 +1206,39 @@ section.block { padding: 96px 0; position: relative; z-index: 1; }
   .contact-col .brand { height: 70px; }
   .contact-col .tag { grid-column: 1; grid-row: 2; }
   .contact-col .contact-list { grid-column: 1; grid-row: 3; align-self: start; }
+}
+
+/* ==========================================================================
+   SCROLL CUE
+   A faint arrow pinned to the viewport, so it holds its place as the page
+   moves under it. Fades out once the foot of the page is reached, and never
+   appears at all on a page short enough not to scroll (js/main.js).
+   ========================================================================== */
+.scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+  color: var(--gold);
+  opacity: 0.3;
+  transition: opacity 0.5s ease;
+}
+.scroll-cue svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 7px rgba(201,151,63,0.5));
+  animation: scrollCue 2.6s ease-in-out infinite;
+}
+.scroll-cue.is-hidden { opacity: 0; }
+@keyframes scrollCue {
+  0%, 100% { transform: translateY(0);   opacity: 0.55; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue svg { animation: none; }
 }
 
 .text-center { text-align: center; }
